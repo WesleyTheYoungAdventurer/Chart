@@ -2,32 +2,49 @@
     x:Class="Chart.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:converter="[converter ]clr-namespace:Chart.Converter"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:ext="http://schemas.abtsoftware.co.uk/scichart/exampleExternals"
+    xmlns:hc="[hc ]https://handyorg.github.io/handycontrol"
     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-    xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sci="http://schemas.abtsoftware.co.uk/scichart"
-    Title="Data Chart"
+    Title="Chart"
     Width="1035"
     Height="600"
-    MinWidth="1035"
+    MinWidth="1050"
     MinHeight="600"
     Topmost="True"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Window.Resources>
         <!--<converter:TipConverter x:Key="tipConverter" />-->
+        <!--  XY Axis Title Style  -->
         <DataTemplate x:Key="xyTitle">
             <StackPanel>
                 <TextBlock Text="{Binding Title}" />
             </StackPanel>
         </DataTemplate>
+        <!--  Series List Style  -->
+        <DataTemplate x:Key="SeriesList">
+            <StackPanel Orientation="Horizontal">
+                <Button
+                    Width="17"
+                    Height="17"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{Binding Code}"
+                    BorderBrush="{x:Null}" />
+                <CheckBox
+                    Margin="5,2,5,2"
+                    Command="{Binding Path=DataContext.SelectCheckBoxCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}"
+                    IsChecked="{Binding Selector, Mode=TwoWay}"
+                    Tag="{Binding ID}" />
+                <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+            </StackPanel>
+        </DataTemplate>
     </Window.Resources>
     <Grid Background="#f0f0f0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="35" />
+            <RowDefinition Height="40" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <StackPanel
@@ -36,6 +53,7 @@
             Orientation="Horizontal">
             <Button
                 Width="60"
+                Margin="0,0,5,0"
                 Command="{Binding OpenPathCommand}"
                 Content="路径" />
             <TextBox
@@ -44,7 +62,7 @@
                 VerticalContentAlignment="Center"
                 Text="{Binding FullPath}" />
             <Label
-                Margin="20,0,0,0"
+                Margin="13,0,0,0"
                 VerticalAlignment="Center"
                 Content="X轴" />
             <ComboBox
@@ -60,7 +78,7 @@
                 </i:Interaction.Triggers>
             </ComboBox>
             <Label
-                Margin="20,0,0,0"
+                Margin="13,0,0,0"
                 VerticalAlignment="Center"
                 Content="Y轴" />
             <ComboBox
@@ -142,32 +160,7 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="30" />
                 </Grid.RowDefinitions>
-                <ListBox ItemsSource="{Binding ListColor}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Button
-                                    Width="15"
-                                    Height="15"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Background="{Binding Code}"
-                                    BorderBrush="{x:Null}">
-                                    <Border
-                                        Width="15"
-                                        Height="15"
-                                        Background="{Binding Code}" />
-                                </Button>
-                                <CheckBox
-                                    Margin="5,2,5,2"
-                                    Command="{Binding Path=DataContext.SelectCheckBoxCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}"
-                                    IsChecked="{Binding Selector, Mode=TwoWay}"
-                                    Tag="{Binding ID}" />
-                                <TextBlock Text="{Binding Name}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                <ListBox ItemTemplate="{StaticResource SeriesList}" ItemsSource="{Binding ListColor}" />
                 <DockPanel Grid.Row="1">
                     <CheckBox Content="Zoom" IsChecked="{Binding EnableZoom, Mode=TwoWay}" />
                     <CheckBox Content="Pan" IsChecked="{Binding EnablePan, Mode=TwoWay}" />
