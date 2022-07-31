@@ -27,13 +27,14 @@ namespace Chart.ViewModel
         {
             List<double> x = new List<double>();
             List<double> y = new List<double>();
-            for (int i = 0; i < 10000000; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 x.Add(i + 10);
                 y.Add(i + i * 0.2);
              }
 
             var lineData = new XyDataSeries<double, double>() { SeriesName = "TestSeries" };
+            lineData.AcceptsUnsortedData = true;
             lineData.Append(x,y);
             _renderableSeries = new ObservableCollection<IRenderableSeriesViewModel>();
             RanderableSeries.Add(new LineRenderableSeriesViewModel()
@@ -57,8 +58,8 @@ namespace Chart.ViewModel
                 // Zoom the chart to fit
                 lineData.InvalidateParentSurface(RangeMode.ZoomToFit);
             });
+        }
 
-        }   
         public ObservableCollection<IRenderableSeriesViewModel> RanderableSeries
         {
             get { return _renderableSeries; }

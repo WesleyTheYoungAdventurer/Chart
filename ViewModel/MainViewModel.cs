@@ -388,7 +388,6 @@ namespace Chart.ViewModel
                 }
             }
         }
-
     }
 
     public class ButColor
