@@ -45,22 +45,22 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="HandyControl, Version=3.3.0.0, Culture=neutral, PublicKeyToken=45be8712787a1e5b, processorArchitecture=MSIL">
-      <HintPath>packages\HandyControls.3.4.1\lib\net472\HandyControl.dll</HintPath>
+      <HintPath>..\..\Chart20220725\Chart\bin\Debug\HandyControl.dll</HintPath>
     </Reference>
     <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
-      <HintPath>packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
+      <HintPath>..\..\Chart20220725\Chart\bin\Debug\LiveCharts.dll</HintPath>
     </Reference>
     <Reference Include="LiveCharts.Geared, Version=1.2.8.2, Culture=neutral, PublicKeyToken=7292f245d14ab8bf, processorArchitecture=MSIL">
-      <HintPath>packages\LiveCharts.Geared.1.2.9\lib\net45\LiveCharts.Geared.dll</HintPath>
+      <HintPath>..\..\Chart20220725\Chart\bin\Debug\LiveCharts.Geared.dll</HintPath>
     </Reference>
     <Reference Include="LiveCharts.Wpf, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
-      <HintPath>packages\LiveCharts.Wpf.0.9.7\lib\net45\LiveCharts.Wpf.dll</HintPath>
+      <HintPath>..\..\Chart20220725\Chart\bin\Debug\LiveCharts.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
+      <HintPath>..\..\Chart20220725\Chart\bin\Debug\Microsoft.Expression.Interactions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xaml.Behaviors">
-      <HintPath>C:\Users\zheng\Desktop\Chart20220725\Chart\bin\Debug\Microsoft.Xaml.Behaviors.dll</HintPath>
+      <HintPath>..\..\Chart20220725\Chart\bin\Debug\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
     <Reference Include="SciChart.Charting, Version=6.0.1.12982, Culture=neutral, PublicKeyToken=b55dd9efe817e823, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -84,21 +84,21 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+      <HintPath>..\..\Chart20220725\Chart\bin\Debug\System.Memory.dll</HintPath>
     </Reference>
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <HintPath>..\..\Chart20220725\Chart\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
+      <HintPath>..\..\Chart20220725\Chart\bin\Debug\System.Windows.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -109,14 +109,17 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="Unity.Configuration">
+      <HintPath>..\..\Chart20220725\Chart\bin\Debug\Unity.Configuration.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Interception">
-      <HintPath>C:\Users\zheng\Desktop\Chart20220725\Chart\bin\Debug\Unity.Interception.dll</HintPath>
+      <HintPath>..\..\Chart20220725\Chart\bin\Debug\Unity.Interception.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Interception.Configuration">
-      <HintPath>C:\Users\zheng\Desktop\Chart20220725\Chart\bin\Debug\Unity.Interception.Configuration.dll</HintPath>
+      <HintPath>..\..\Chart20220725\Chart\bin\Debug\Unity.Interception.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RegistrationByConvention">
-      <HintPath>C:\Users\zheng\Desktop\Chart20220725\Chart\bin\Debug\Unity.RegistrationByConvention.dll</HintPath>
+      <HintPath>..\..\Chart20220725\Chart\bin\Debug\Unity.RegistrationByConvention.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />

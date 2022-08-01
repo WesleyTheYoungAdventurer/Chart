@@ -104,7 +104,7 @@
                 Grid.Column="0"
                 Margin="0,0,5,0"
                 Background="White">
-                <sci:SciChartSurface ChartTitle="{Binding ChartTitle}" RenderableSeries="{sci:SeriesBinding RanderableSeries}">
+                <sci:SciChartSurface ChartTitle="{Binding ChartTitle}" RenderableSeries="{sci:SeriesBinding RenderableSeries}">
 
                     <sci:SciChartSurface.ChartModifier>
                         <sci:ModifierGroup>

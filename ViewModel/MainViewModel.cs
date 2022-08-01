@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media;
 
@@ -16,8 +17,8 @@ namespace Chart.ViewModel
         private string _chartTitle ;
         private string _xAxisTitle ;
         private string _yAxisTitle ;
-        private int _xAxisSelect;
-        private int _yAxisSelect;
+        private int _xAxisSelect =-1;
+        private int _yAxisSelect =-1;
         private bool _enableZoom;
         private bool _enablePan = true;
         private bool _enableTip;
@@ -181,7 +182,6 @@ namespace Chart.ViewModel
             _renderableSeries = new ObservableCollection<IRenderableSeriesViewModel>();
         }
 
-
         public ObservableCollection<IRenderableSeriesViewModel> RenderableSeries
         {
             get { return _renderableSeries; }
@@ -301,68 +301,75 @@ namespace Chart.ViewModel
             // 清空之前图表含有的系列
             RenderableSeries.Clear();
 
-            FullPath = folderBrowserDialog.SelectedPath.Trim();
-
-            // 获取数据
-            CSV.ReadCsv(FullPath, out List<string> data, out _);
-            List<XyTitle> xyTitles = new List<XyTitle>();
-
-            // XY轴添加标题
-            if (data.Count() != 0)
+            new Task(() =>
             {
-                string[] xyTitle = data.First().Split(new char[] { ',' });
-                for (int i = 0; i < xyTitle.Count(); i++)
+                FullPath = folderBrowserDialog.SelectedPath.Trim();
+
+                // 获取数据
+                CSV.ReadCsv(FullPath, out List<string> data, out _);
+                List<XyTitle> xyTitles = new List<XyTitle>();
+
+                // XY轴添加标题
+                if (data.Count() != 0)
                 {
-                    xyTitles.Add(new XyTitle() { Title = xyTitle[i] });
+                    string[] xyTitle = data.First().Split(new char[] { ',' });
+                    for (int i = 0; i < xyTitle.Count(); i++)
+                    {
+                        xyTitles.Add(new XyTitle() { Title = xyTitle[i] });
+                    }
                 }
-            }
-            ArrayTitle = xyTitles;
+                ArrayTitle = xyTitles;
+            }).Start();
         }
 
-
+        public delegate void printString();
         /// <summary>
         /// 选择坐标轴更新
         /// </summary>
         public void SelectItemChanged()
         {
-
             // 清空之前图表含有的系列数据
             RenderableSeries.Clear();
             xyDataSeries.Clear();
 
-
-            // 获取数据
-            CSV.ReadCsv(FullPath, out _, out Dictionary<string, List<string[]>> DataDict);
-            List<ButColor> ColorList = new List<ButColor>();
-            int count = 0;
-            Random random = new Random();
-
-            if (XAxisSelect>=0 && YAxisSelect >= 0)
+            new Task(() =>
             {
-                foreach (var i in DataDict)
+                // 获取数据
+                CSV.ReadCsv(FullPath, out _, out Dictionary<string, List<string[]>> DataDict);
+                List<ButColor> ColorList = new List<ButColor>();
+                int count = 0;
+                Random random = new Random();
+
+                if (XAxisSelect >= 0 && YAxisSelect >= 0)
                 {
-                    string colorIndex = _windownColors[random.Next(_windownColors.Count())];
-                    ColorList.Add(new ButColor() { ID =count, Code = colorIndex, Name = i.Key, Selector = true});
-                    xyDataSeries.Add(new XyDataSeries<double, double>() { SeriesName = i.Key });
-                    // 系列允许添加未排序数据
-                    xyDataSeries[count].AcceptsUnsortedData = true;
-
-                    for (int j = 0; j < i.Value.Count() - 1; j++)
+                    foreach (var i in DataDict)
                     {
-                        xyDataSeries[count].Append(double.Parse(i.Value[1 + j][XAxisSelect]), double.Parse(i.Value[1 + j][YAxisSelect]));
+                        string colorIndex = _windownColors[random.Next(_windownColors.Count())];
+                        ColorList.Add(new ButColor() { ID = count, Code = colorIndex, Name = i.Key, Selector = true });
+                        xyDataSeries.Add(new XyDataSeries<double, double>() { SeriesName = i.Key });
+                        // 系列允许添加未排序数据
+                        xyDataSeries[count].AcceptsUnsortedData = true;
+
+                        for (int j = 0; j < i.Value.Count() - 1; j++)
+                        {
+                            xyDataSeries[count].Append(double.Parse(i.Value[1 + j][XAxisSelect]), double.Parse(i.Value[1 + j][YAxisSelect]));
+                        }
+
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            RenderableSeries.Add(new LineRenderableSeriesViewModel()
+                            {
+                                StrokeThickness = 2,
+                                Stroke = (Color)ColorConverter.ConvertFromString(colorIndex),
+                                DataSeries = xyDataSeries[count],
+
+                            });
+                        });
+                        count++;
                     }
-
-                    RenderableSeries.Add(new LineRenderableSeriesViewModel()
-                    {
-                        StrokeThickness = 2,
-                        Stroke = (Color)ColorConverter.ConvertFromString(colorIndex),
-                        DataSeries = xyDataSeries[count],
-
-                    });
-                    count++;
                 }
-            }
-            ListColor = ColorList;
+                ListColor = ColorList;
+            }).Start();
         }
 
         /// <summary>
@@ -370,23 +377,28 @@ namespace Chart.ViewModel
         /// </summary>
         private void SelectCheckBoxEnable()
         {
+
             // 清空之前图表含有的系列
             RenderableSeries.Clear();
 
-
-            for (int i = 0; i < ListColor.Count(); i++)
+            new Task(() =>
             {
-                if (ListColor[i].Selector)
+                for (int i = 0; i < ListColor.Count(); i++)
                 {
-                    RenderableSeries.Add(new LineRenderableSeriesViewModel()
+                    if (ListColor[i].Selector)
                     {
-                        StrokeThickness = 2,
-                        Stroke = (Color)ColorConverter.ConvertFromString(ListColor[i].Code),
-                        DataSeries = xyDataSeries[i],
-
-                    });
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            RenderableSeries.Add(new LineRenderableSeriesViewModel()
+                            {
+                                StrokeThickness = 2,
+                                Stroke = (Color)ColorConverter.ConvertFromString(ListColor[i].Code),
+                                DataSeries = xyDataSeries[i],
+                            });
+                        });
+                    }
                 }
-            }
+            }).Start();
         }
     }
 
