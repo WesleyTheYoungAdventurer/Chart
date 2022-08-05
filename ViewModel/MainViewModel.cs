@@ -1,5 +1,7 @@
 ﻿using Chart.Commands;
 using Chart.Model;
+using HandyControl.Controls;
+using HandyControl.Tools;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
 using System;
@@ -7,6 +9,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
 
@@ -23,7 +27,7 @@ namespace Chart.ViewModel
         private bool _enablePan = true;
         private bool _enableTip;
         private string _path;
-        private List<ButColor> _listColor;
+        private List<BtnColor> _listColor;
         private List<XyTitle> _ArrayTitle;
         private ObservableCollection<IRenderableSeriesViewModel> _renderableSeries;
         readonly string[] _windownColors ={
@@ -173,14 +177,19 @@ namespace Chart.ViewModel
 
         public MainViewModel()
         {
-           
             OpenPathCommand = new MyCommand(SelectPath);
             SelectItemChangedCommand = new MyCommand(SelectItemChanged);
             SelectCheckBoxCommand = new MyCommand(SelectCheckBoxEnable);
+            ShowColorPickerCommand = new MyCommand(ShowColorPicker);
 
             // 实例化SciChart集合
             _renderableSeries = new ObservableCollection<IRenderableSeriesViewModel>();
         }
+
+        public MyCommand OpenPathCommand { get; set; }
+        public MyCommand SelectItemChangedCommand { get; set; }
+        public MyCommand SelectCheckBoxCommand { get; set; }
+        public MyCommand ShowColorPickerCommand { get; set; }
 
         public ObservableCollection<IRenderableSeriesViewModel> RenderableSeries
         {
@@ -246,9 +255,7 @@ namespace Chart.ViewModel
             set { UpdateProper(ref _enableTip, value); }
         }
 
-        public MyCommand OpenPathCommand { get; set; }
-        public MyCommand SelectItemChangedCommand { get; set; }
-        public MyCommand SelectCheckBoxCommand { get; set; }
+        public int ListIndex { get; set; }
 
         public string FullPath
         {
@@ -256,12 +263,11 @@ namespace Chart.ViewModel
             set { UpdateProper(ref _path, value); }
         }
 
-
-        public List<ButColor> ListColor
+        public List<BtnColor> ListColor
         {
             get { return _listColor; }
-            set { UpdateProper(ref _listColor, value); }
-        }
+            set{UpdateProper(ref _listColor, value); }
+         }
 
         public List<XyTitle> ArrayTitle
         {
@@ -336,7 +342,7 @@ namespace Chart.ViewModel
             {
                 // 获取数据
                 CSV.ReadCsv(FullPath, out _, out Dictionary<string, List<string[]>> DataDict);
-                List<ButColor> ColorList = new List<ButColor>();
+                List<BtnColor> ColorList = new List<BtnColor>();
                 int count = 0;
                 Random random = new Random();
 
@@ -345,7 +351,7 @@ namespace Chart.ViewModel
                     foreach (var i in DataDict)
                     {
                         string colorIndex = _windownColors[random.Next(_windownColors.Count())];
-                        ColorList.Add(new ButColor() { ID = count, Code = colorIndex, Name = i.Key, Selector = true });
+                        ColorList.Add(new BtnColor() { ID = count, Code = colorIndex, Name = i.Key, Selector = true});
                         xyDataSeries.Add(new XyDataSeries<double, double>() { SeriesName = i.Key });
                         // 系列允许添加未排序数据
                         xyDataSeries[count].AcceptsUnsortedData = true;
@@ -375,42 +381,90 @@ namespace Chart.ViewModel
         /// <summary>
         /// 勾选框使能判断
         /// </summary>
-        private void SelectCheckBoxEnable()
+        public void SelectCheckBoxEnable()
         {
+            // 先删除指定索引的系列
+            RenderableSeries.RemoveAt(ListIndex);
 
-            // 清空之前图表含有的系列
-            RenderableSeries.Clear();
-
-            new Task(() =>
+            // 勾选显示就在指定的索引添加系列
+            if (ListColor[ListIndex].Selector)
             {
-                for (int i = 0; i < ListColor.Count(); i++)
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
-                    if (ListColor[i].Selector)
+                    RenderableSeries.Insert(ListIndex, new LineRenderableSeriesViewModel()
                     {
-                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            RenderableSeries.Add(new LineRenderableSeriesViewModel()
-                            {
-                                StrokeThickness = 2,
-                                Stroke = (Color)ColorConverter.ConvertFromString(ListColor[i].Code),
-                                DataSeries = xyDataSeries[i],
-                            });
-                        });
-                    }
-                }
-            }).Start();
+                        StrokeThickness = 2,
+                        Stroke = (Color)ColorConverter.ConvertFromString(ListColor[ListIndex].Code),
+                        DataSeries = xyDataSeries[ListIndex]
+                    });
+                });
+            }
+
+            // 取消勾选就在指定的索引添加空数据系列
+            else
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    RenderableSeries.Insert(ListIndex, new LineRenderableSeriesViewModel() { });
+                });
+            }
+        }
+
+        public void ShowColorPicker()
+        {
+            var picker = SingleOpenHelper.CreateControl<ColorPicker>();
+            var window = new PopupWindow
+            {
+                PopupElement = picker,
+                AllowsTransparency = true,
+                WindowStyle = WindowStyle.None,
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                Title = ListColor[ListIndex].Name
+            };
+
+            picker.Width = 265;
+            picker.Height = 360;
+            picker.Canceled += delegate { window.Close(); };
+            picker.Confirmed += delegate
+            {
+                SolidColorBrush getColor = picker.SelectedBrush;
+
+                RenderableSeries.RemoveAt(ListIndex);
+                RenderableSeries.Insert(ListIndex, new LineRenderableSeriesViewModel()
+                {
+                    StrokeThickness = 2,
+                    Stroke = (Color)ColorConverter.ConvertFromString(getColor.ToString()),
+                    DataSeries = xyDataSeries[ListIndex]
+                });
+
+                ListColor[ListIndex].Code = getColor.ToString();
+
+            };
+            window.ShowDialog();
         }
     }
 
-    public class ButColor
+    class BtnColor: ViewModelBase
     {
+        /// <summary>
+        /// 序号
+        /// </summary>
         public int ID { get; set; }
-        public string Code { get; set; }
+        /// <summary>
+        /// 系列颜色
+        /// </summary>
+        public string Code{ get; set;}
+        /// <summary>
+        /// 文件名字
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// 系列显示/隐藏
+        /// </summary>
         public bool Selector { get; set; }
     }
 
-    public class XyTitle
+    class XyTitle
     {
         public string Title { get; set; }
     }
