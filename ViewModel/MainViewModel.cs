@@ -175,6 +175,7 @@ namespace Chart.ViewModel
  };
         private List<XyDataSeries<double, double>> xyDataSeries = new List<XyDataSeries<double, double>>();
 
+
         public MainViewModel()
         {
             OpenPathCommand = new MyCommand(SelectPath);
@@ -262,13 +263,14 @@ namespace Chart.ViewModel
             get { return _path; }
             set { UpdateProper(ref _path, value); }
         }
-
+       
         public List<BtnColor> ListColor
         {
             get { return _listColor; }
-            set{UpdateProper(ref _listColor, value); }
-         }
+            set { UpdateProper(ref _listColor, value); }
+        }
 
+        
         public List<XyTitle> ArrayTitle
         {
             get { return _ArrayTitle; }
@@ -342,16 +344,15 @@ namespace Chart.ViewModel
             {
                 // 获取数据
                 CSV.ReadCsv(FullPath, out _, out Dictionary<string, List<string[]>> DataDict);
-                List<BtnColor> ColorList = new List<BtnColor>();
+                List<BtnColor> ColorList = new List<BtnColor>() { };
                 int count = 0;
                 Random random = new Random();
-
                 if (XAxisSelect >= 0 && YAxisSelect >= 0)
                 {
                     foreach (var i in DataDict)
                     {
                         string colorIndex = _windownColors[random.Next(_windownColors.Count())];
-                        ColorList.Add(new BtnColor() { ID = count, Code = colorIndex, Name = i.Key, Selector = true});
+                        ColorList.Add(new BtnColor() { ID = count, BgColor = colorIndex, Name = i.Key, Selector = true});
                         xyDataSeries.Add(new XyDataSeries<double, double>() { SeriesName = i.Key });
                         // 系列允许添加未排序数据
                         xyDataSeries[count].AcceptsUnsortedData = true;
@@ -394,7 +395,7 @@ namespace Chart.ViewModel
                     RenderableSeries.Insert(ListIndex, new LineRenderableSeriesViewModel()
                     {
                         StrokeThickness = 2,
-                        Stroke = (Color)ColorConverter.ConvertFromString(ListColor[ListIndex].Code),
+                        Stroke = (Color)ColorConverter.ConvertFromString(ListColor[ListIndex].BgColor),
                         DataSeries = xyDataSeries[ListIndex]
                     });
                 });
@@ -410,6 +411,9 @@ namespace Chart.ViewModel
             }
         }
 
+        /// <summary>
+        /// 系列颜色选择器
+        /// </summary>
         public void ShowColorPicker()
         {
             var picker = SingleOpenHelper.CreateControl<ColorPicker>();
@@ -422,23 +426,24 @@ namespace Chart.ViewModel
                 Title = ListColor[ListIndex].Name
             };
 
-            picker.Width = 265;
-            picker.Height = 360;
+            picker.SelectedBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(ListColor[ListIndex].BgColor)); ;
             picker.Canceled += delegate { window.Close(); };
             picker.Confirmed += delegate
             {
                 SolidColorBrush getColor = picker.SelectedBrush;
 
-                RenderableSeries.RemoveAt(ListIndex);
-                RenderableSeries.Insert(ListIndex, new LineRenderableSeriesViewModel()
+                if (ListColor[ListIndex].Selector)
                 {
-                    StrokeThickness = 2,
-                    Stroke = (Color)ColorConverter.ConvertFromString(getColor.ToString()),
-                    DataSeries = xyDataSeries[ListIndex]
-                });
-
-                ListColor[ListIndex].Code = getColor.ToString();
-
+                    RenderableSeries.RemoveAt(ListIndex);
+                    RenderableSeries.Insert(ListIndex, new LineRenderableSeriesViewModel()
+                    {
+                        StrokeThickness = 2,
+                        Stroke = (Color)ColorConverter.ConvertFromString(getColor.ToString()),
+                        DataSeries = xyDataSeries[ListIndex]
+                    });
+                }
+                ListColor[ListIndex].BgColor = getColor.ToString();
+                window.Close();
             };
             window.ShowDialog();
         }
@@ -446,26 +451,52 @@ namespace Chart.ViewModel
 
     class BtnColor: ViewModelBase
     {
+        private int _id;
+        private string _bgColor;
+        private string _name;
+        private bool _selector;
+
         /// <summary>
         /// 序号
         /// </summary>
-        public int ID { get; set; }
+        public int ID
+        {
+            get { return _id; }
+            set { UpdateProper(ref _id, value); }
+        }
         /// <summary>
         /// 系列颜色
         /// </summary>
-        public string Code{ get; set;}
+        public string BgColor
+        {
+            get { return _bgColor; }
+            set { UpdateProper(ref _bgColor, value); }
+        }
         /// <summary>
         /// 文件名字
         /// </summary>
-        public string Name { get; set; }
+        public string Name
+        {
+            get { return _name; }
+            set { UpdateProper(ref _name, value); }
+        }
         /// <summary>
         /// 系列显示/隐藏
         /// </summary>
-        public bool Selector { get; set; }
+        public bool Selector
+        {
+            get { return _selector; }
+            set { UpdateProper(ref _selector, value); }
+        }
     }
 
-    class XyTitle
+    class XyTitle: ViewModelBase
     {
-        public string Title { get; set; }
+        private string _title;
+        public string Title
+        {
+            get { return _title; }
+            set { UpdateProper(ref _title, value); }
+        }
     }
 }

@@ -33,7 +33,7 @@
                             Name="Border"
                             Padding="1,1,1,1"
                             Background="Transparent"
-                            CornerRadius ="5"
+                            CornerRadius="5"
                             SnapsToDevicePixels="True">
                             <ContentPresenter />
                         </Border>
@@ -148,8 +148,50 @@
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Top"
                                 ShowLegend="True" />-->
-                            <sci:TooltipModifier IsEnabled="False" ShowTooltipOn="MouseHover" />
-                            <sci:RolloverModifier IsEnabled="{Binding EnableTip}" ShowAxisLabels="True" />
+                            <sci:TooltipModifier IsEnabled="False" ShowTooltipOn="Always" />
+                            <sci:RolloverModifier
+                                IsEnabled="{Binding EnableTip}"
+                                ShowAxisLabels="True"
+                                ShowTooltipOn="Always" />
+                            <sci:CursorModifier
+                                ShowAxisLabels="True"
+                                ShowTooltip="False"
+                                UseInterpolation="True" />
+
+                            <!--  Provides Interactivity  -->
+                            <sci:RubberBandXyZoomModifier />
+                            <sci:XAxisDragModifier />
+                            <sci:YAxisDragModifier AxisId="Left" />
+                            <sci:YAxisDragModifier AxisId="Right" />
+                            <sci:ZoomExtentsModifier />
+
+                            <sci:SeriesSelectionModifier>
+                                <sci:SeriesSelectionModifier.SelectedSeriesStyle>
+
+                                    <!--  When a series is selected (on click), apply this style  -->
+                                    <!--  Changes Stroke to white on click  -->
+                                    <!--  Applies a PointMarker on click  -->
+                                    <Style TargetType="sci:BaseRenderableSeries">
+                                        <Setter Property="Stroke" Value="White" />
+                                        <Setter Property="PointMarkerTemplate">
+                                            <Setter.Value>
+                                                <!--  This is how we do PointMarkerTemplates in Scichart v2.0. You can either declare an EllipsePointMarker inline,  -->
+                                                <!--  or, if temmplating (because you are sharing a style across many series), then use a ControlTemplate with a BasePointMarker,  -->
+                                                <!--  or UIElement to replicate across each data-point  -->
+                                                <ControlTemplate>
+                                                    <sci:EllipsePointMarker
+                                                        Width="7"
+                                                        Height="7"
+                                                        Fill="#FF00DC"
+                                                        Stroke="White" />
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+
+                                </sci:SeriesSelectionModifier.SelectedSeriesStyle>
+                            </sci:SeriesSelectionModifier>
+
                         </sci:ModifierGroup>
                     </sci:SciChartSurface.ChartModifier>
 
@@ -197,7 +239,7 @@
                                 <Button
                                     Width="17"
                                     Height="17"
-                                    Background="{Binding Code}"
+                                    Background="{Binding BgColor}"
                                     BorderBrush="{x:Null}"
                                     Command="{Binding Path=DataContext.ShowColorPickerCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}"
                                     Tag="{Binding ID}" />
