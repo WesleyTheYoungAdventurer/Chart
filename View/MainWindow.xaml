@@ -144,10 +144,10 @@
                             <sci:ZoomExtentsModifier />
 
                             <!--  adding Tooltips, Legends to Chart  -->
-                            <!--<sci:LegendModifier
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Top"
-                                ShowLegend="True" />-->
+                            <sci:LegendModifier
+                                GetLegendDataFor="SelectedSeries"
+                                ShowLegend="True"
+                                ShowVisibilityCheckboxes="False" />
                             <sci:TooltipModifier IsEnabled="False" ShowTooltipOn="Always" />
                             <sci:RolloverModifier
                                 IsEnabled="{Binding EnableTip}"
@@ -158,40 +158,30 @@
                                 ShowTooltip="False"
                                 UseInterpolation="True" />
 
-                            <!--  Provides Interactivity  -->
-                            <sci:RubberBandXyZoomModifier />
-                            <sci:XAxisDragModifier />
-                            <sci:YAxisDragModifier AxisId="Left" />
-                            <sci:YAxisDragModifier AxisId="Right" />
-                            <sci:ZoomExtentsModifier />
-
                             <sci:SeriesSelectionModifier>
                                 <sci:SeriesSelectionModifier.SelectedSeriesStyle>
-
                                     <!--  When a series is selected (on click), apply this style  -->
-                                    <!--  Changes Stroke to white on click  -->
                                     <!--  Applies a PointMarker on click  -->
                                     <Style TargetType="sci:BaseRenderableSeries">
-                                        <Setter Property="Stroke" Value="White" />
+                                        <Setter Property="StrokeThickness" Value="5" />
                                         <Setter Property="PointMarkerTemplate">
                                             <Setter.Value>
-                                                <!--  This is how we do PointMarkerTemplates in Scichart v2.0. You can either declare an EllipsePointMarker inline,  -->
-                                                <!--  or, if temmplating (because you are sharing a style across many series), then use a ControlTemplate with a BasePointMarker,  -->
-                                                <!--  or UIElement to replicate across each data-point  -->
                                                 <ControlTemplate>
                                                     <sci:EllipsePointMarker
-                                                        Width="7"
-                                                        Height="7"
-                                                        Fill="#FF00DC"
-                                                        Stroke="White" />
+                                                        Width="1"
+                                                        Height="1"
+                                                        Fill="White" />
                                                 </ControlTemplate>
                                             </Setter.Value>
                                         </Setter>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Foreground" Value="White" />
+                                            </Trigger>
+                                        </Style.Triggers>
                                     </Style>
-
                                 </sci:SeriesSelectionModifier.SelectedSeriesStyle>
                             </sci:SeriesSelectionModifier>
-
                         </sci:ModifierGroup>
                     </sci:SciChartSurface.ChartModifier>
 
@@ -202,7 +192,7 @@
 
                     <!--  Create a Y Axis with GrowBy. Optional bands give a cool look and feel for minimal performance impact  -->
                     <sci:SciChartSurface.YAxis>
-                        <sci:NumericAxis HorizontalAlignment="Left" AxisTitle="{Binding YAisTitle}" />
+                        <sci:NumericAxis AxisAlignment="Left" AxisTitle="{Binding YAisTitle}" />
                     </sci:SciChartSurface.YAxis>
                 </sci:SciChartSurface>
                 <!--<lvc:CartesianChart
@@ -251,11 +241,6 @@
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="ShowColorPicker">
-                            <i:InvokeCommandAction Command="{Binding ShowColorPickerCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
                 </ListBox>
                 <DockPanel Grid.Row="1">
                     <CheckBox Content="Zoom" IsChecked="{Binding EnableZoom, Mode=TwoWay}" />

@@ -12,7 +12,7 @@ namespace Chart.ViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void UpdateProper<T>(ref T properValue, T newValue, [CallerMemberName]string properName="")
+        public void UpdateProper<T>(ref T properValue, T newValue, [CallerMemberName] string properName = "")
         {
             if (object.Equals(properValue, newValue))
                 return;
@@ -21,7 +21,7 @@ namespace Chart.ViewModel
             OnPropertyChanged(properName);
         }
 
-        public void OnPropertyChanged([CallerMemberName]string propertyChanged="")
+        public void OnPropertyChanged([CallerMemberName] string propertyChanged = "")
         {
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null)

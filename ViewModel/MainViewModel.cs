@@ -23,6 +23,7 @@ namespace Chart.ViewModel
         private string _yAxisTitle ;
         private int _xAxisSelect =-1;
         private int _yAxisSelect =-1;
+        private int _listIndex = -1;
         private bool _enableZoom;
         private bool _enablePan = true;
         private bool _enableTip;
@@ -256,7 +257,12 @@ namespace Chart.ViewModel
             set { UpdateProper(ref _enableTip, value); }
         }
 
-        public int ListIndex { get; set; }
+
+        public int ListIndex
+        {
+            get { return _listIndex; }
+            set { _listIndex = value; } 
+        }
 
         public string FullPath
         {
@@ -347,31 +353,47 @@ namespace Chart.ViewModel
                 List<BtnColor> ColorList = new List<BtnColor>() { };
                 int count = 0;
                 Random random = new Random();
+
+
                 if (XAxisSelect >= 0 && YAxisSelect >= 0)
                 {
                     foreach (var i in DataDict)
                     {
                         string colorIndex = _windownColors[random.Next(_windownColors.Count())];
-                        ColorList.Add(new BtnColor() { ID = count, BgColor = colorIndex, Name = i.Key, Selector = true});
-                        xyDataSeries.Add(new XyDataSeries<double, double>() { SeriesName = i.Key });
-                        // 系列允许添加未排序数据
-                        xyDataSeries[count].AcceptsUnsortedData = true;
+                        BtnColor btnColor = new BtnColor() { ID = count, BgColor = colorIndex, Name = i.Key, Selector = true };
+                        XyDataSeries<double, double> xyData = new XyDataSeries<double, double>() { SeriesName = i.Key };
+                        xyData.AcceptsUnsortedData = true;
 
-                        for (int j = 0; j < i.Value.Count() - 1; j++)
-                        {
-                            xyDataSeries[count].Append(double.Parse(i.Value[1 + j][XAxisSelect]), double.Parse(i.Value[1 + j][YAxisSelect]));
-                        }
+                        string XAxis = "", Yaxis = "";
 
-                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        try
                         {
-                            RenderableSeries.Add(new LineRenderableSeriesViewModel()
+                            for (int j = 0; j < i.Value.Count() - 1; j++)
                             {
-                                StrokeThickness = 2,
-                                Stroke = (Color)ColorConverter.ConvertFromString(colorIndex),
-                                DataSeries = xyDataSeries[count],
+                                XAxis = i.Value[1 + j][XAxisSelect];
+                                Yaxis = i.Value[1 + j][YAxisSelect];
+                                xyData.Append(double.Parse(i.Value[1 + j][XAxisSelect]), double.Parse(i.Value[1 + j][YAxisSelect]));
+                            }
 
+                            ColorList.Add(btnColor);
+                            xyDataSeries.Add(xyData);
+
+                            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                RenderableSeries.Add(new LineRenderableSeriesViewModel()
+                                {
+                                    StrokeThickness = 2,
+                                    Stroke = (Color)ColorConverter.ConvertFromString(colorIndex),
+                                    DataSeries = xyDataSeries[count],
+
+                                });
                             });
-                        });
+                        }
+                        catch (Exception)
+                        {
+                            HandyControl.Controls.MessageBox.Show($"文件名：{i.Key}\n" + $"X轴：{XAxis}\n" + $"Y轴:{Yaxis}" , "数据类型", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                        
                         count++;
                     }
                 }
